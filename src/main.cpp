@@ -83,12 +83,8 @@ void print_tree(Node *node) {
   print_tree(node->right_child);
 }
 
-int main(int argc, char *argv[]) {
-  if (argc < 2) {
-    return 0;
-  }
-
-  std::ifstream infile(argv[1]);
+std::vector<int> load_file(const char *str) {
+  std::ifstream infile(str);
   std::string line;
   std::vector<int> values;
 
@@ -101,13 +97,64 @@ int main(int argc, char *argv[]) {
     values.push_back(std::stoi(str));
   }
 
+  return values;
+}
+
+Node *find_by_value(Node *node, int val, std::vector<Node *> &path) {
+  if (node == nullptr) {
+    return nullptr;
+  }
+
+  path.push_back(node);
+
+  if (node->value == val) {
+    return node;
+  }
+
+  if (node->value > val) {
+    return find_by_value(node->left_child, val, path);
+  } else {
+    return find_by_value(node->right_child, val, path);
+  }
+
+  return nullptr;
+}
+
+int main(int argc, char *argv[]) {
+  if (argc < 2) {
+    return 0;
+  }
+
+  std::vector<int> values = load_file(argv[1]);
   struct Node *root = new Node{values[0], nullptr, nullptr};
 
   for (const auto &val : values) {
     add_value(root, val);
   }
 
-  print_tree(root);
+  if (argc == 2) {
+    print_tree(root);
+    return 0;
+  }
+
+  std::vector<Node *> path;
+  std::vector<int> search_values = load_file(argv[2]);
+
+  struct Node *ptr = find_by_value(root, search_values[0], path);
+
+  if (ptr != nullptr) {
+    std::cout << ptr->value << " found ";
+
+    for (const auto &node : path) {
+      std::cout << node->value;
+
+      if (node->value != ptr->value) {
+        std::cout << ", ";
+      }
+    }
+  } else {
+    std::cout << search_values[0] << " not found!";
+  }
 
   return 0;
 }
