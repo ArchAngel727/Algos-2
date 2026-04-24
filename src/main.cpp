@@ -100,12 +100,14 @@ std::vector<int> load_file(const char *str) {
   return values;
 }
 
-Node *find_by_value(Node *node, int val, std::vector<Node *> &path) {
+Node *find_by_value(Node *node, int val, std::vector<Node *> *path) {
   if (node == nullptr) {
     return nullptr;
   }
 
-  path.push_back(node);
+  if (path != nullptr) {
+    path->push_back(node);
+  }
 
   if (node->value == val) {
     return node;
@@ -113,11 +115,22 @@ Node *find_by_value(Node *node, int val, std::vector<Node *> &path) {
 
   if (node->value > val) {
     return find_by_value(node->left_child, val, path);
-  } else {
-    return find_by_value(node->right_child, val, path);
   }
 
-  return nullptr;
+  return find_by_value(node->right_child, val, path);
+}
+
+void find_subtree(Node *ptr, std::vector<int> &values) {
+  for (size_t i = 0; i < values.size(); i++) {
+    struct Node *p = find_by_value(ptr, values[i], nullptr);
+
+    if (p == nullptr) {
+      std::cout << "Subtree not found!";
+      return;
+    }
+  }
+
+  std::cout << "Subtree found";
 }
 
 int main(int argc, char *argv[]) {
@@ -139,10 +152,14 @@ int main(int argc, char *argv[]) {
 
   std::vector<Node *> path;
   std::vector<int> search_values = load_file(argv[2]);
+  struct Node *ptr = find_by_value(root, search_values[0], &path);
 
-  struct Node *ptr = find_by_value(root, search_values[0], path);
+  if (search_values.size() == 1) {
+    if (ptr == nullptr) {
+      std::cout << search_values[0] << " not found!";
+      return 0;
+    }
 
-  if (ptr != nullptr) {
     std::cout << ptr->value << " found ";
 
     for (const auto &node : path) {
@@ -152,9 +169,11 @@ int main(int argc, char *argv[]) {
         std::cout << ", ";
       }
     }
-  } else {
-    std::cout << search_values[0] << " not found!";
+
+    return 0;
   }
+
+  find_subtree(ptr, search_values);
 
   return 0;
 }
