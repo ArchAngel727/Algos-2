@@ -59,8 +59,8 @@ int calculate_balance_factor(Node *node) {
     return 0;
   }
 
-  return calculate_height(node->left_child) -
-         calculate_height(node->right_child);
+  return calculate_height(node->right_child) -
+         calculate_height(node->left_child);
 }
 
 void print_tree(Node *node) {
@@ -70,7 +70,7 @@ void print_tree(Node *node) {
 
   int bf = calculate_balance_factor(node);
 
-  print_tree(node->left_child);
+  print_tree(node->right_child);
 
   std::cout << "bal(" << node->value << ") = " << bf;
 
@@ -80,7 +80,7 @@ void print_tree(Node *node) {
 
   std::cout << '\n';
 
-  print_tree(node->right_child);
+  print_tree(node->left_child);
 }
 
 std::vector<int> load_file(const char *str) {
@@ -133,6 +133,68 @@ void find_subtree(Node *ptr, std::vector<int> &values) {
   std::cout << "Subtree found";
 }
 
+Node *find_biggest_node(Node *node) {
+  if (node == nullptr) {
+    return node;
+  }
+
+  if (node->right_child == nullptr) {
+    return node;
+  } else {
+    return find_biggest_node(node->right_child);
+  }
+}
+
+Node *find_smallest_node(Node *node) {
+  if (node == nullptr) {
+    return node;
+  }
+
+  if (node->left_child == nullptr) {
+    return node;
+  } else {
+    return find_biggest_node(node->left_child);
+  }
+}
+
+bool is_tree_avl(Node *node) {
+  if (node == nullptr) {
+    return false;
+  }
+
+  int bf = calculate_balance_factor(node);
+  if (bf > 1 || bf < -1) {
+    return false;
+  }
+
+  is_tree_avl(node->left_child);
+  is_tree_avl(node->right_child);
+
+  return true;
+}
+
+void calculate_tree_avg(Node *node, int &sum, int &count) {
+  if (node == nullptr) {
+    return;
+  }
+
+  count += 1;
+  sum += node->value;
+
+  calculate_tree_avg(node->left_child, sum, count);
+  calculate_tree_avg(node->right_child, sum, count);
+}
+
+void free_tree(Node *node) {
+  if (node == nullptr) {
+    return;
+  }
+
+  free_tree(node->left_child);
+  free_tree(node->right_child);
+  delete node;
+}
+
 int main(int argc, char *argv[]) {
   if (argc < 2) {
     return 0;
@@ -145,8 +207,24 @@ int main(int argc, char *argv[]) {
     add_value(root, val);
   }
 
+  values.clear();
+
   if (argc == 2) {
+    struct Node *ptr_max = find_biggest_node(root);
+    struct Node *ptr_min = find_smallest_node(root);
+    int sum = 0;
+    int count = 0;
+    std::string is_avl = is_tree_avl(root) ? "yes" : "no";
+    calculate_tree_avg(root, sum, count);
+
     print_tree(root);
+    std::cout << "AVL: " << is_avl << '\n';
+    std::cout << "min: " << ptr_min->value << ", ";
+    std::cout << "max: " << ptr_max->value << ", ";
+    std::cout << "avg: " << (double)sum / count;
+
+    free_tree(root);
+
     return 0;
   }
 
@@ -157,6 +235,7 @@ int main(int argc, char *argv[]) {
   if (search_values.size() == 1) {
     if (ptr == nullptr) {
       std::cout << search_values[0] << " not found!";
+      free_tree(root);
       return 0;
     }
 
@@ -170,10 +249,12 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    free_tree(root);
     return 0;
   }
 
   find_subtree(ptr, search_values);
 
+  free_tree(root);
   return 0;
 }

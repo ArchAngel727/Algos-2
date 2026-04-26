@@ -1,0 +1,18 @@
+bal(93) = 0
+bal(87) = 0
+bal(81) = 0
+bal(75) = 0
+bal(68) = 0
+bal(62) = 0
+bal(56) = 0
+bal(50) = 0
+bal(43) = 0
+bal(37) = 0
+bal(31) = 0
+bal(25) = 0
+bal(18) = 0
+bal(12) = 0
+bal(6) = 0
+AVL: yes
+min: 43, max: 93, avg: 49.6
+

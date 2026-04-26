@@ -1,0 +1,12 @@
+bal(79) = 0
+bal(54) = 0
+bal(30) = 0
+bal(23) = 2 (AVL violation!)
+bal(17) = 0
+bal(12) = 0
+bal(11) = 1
+bal(9) = 2 (AVL violation!)
+bal(5) = 3 (AVL violation!)
+bal(3) = 0
+AVL: no
+min: 3, max: 79, avg: 24.3
