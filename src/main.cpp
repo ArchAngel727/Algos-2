@@ -1,8 +1,10 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <optional>
 #include <pstl/glue_algorithm_defs.h>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -81,23 +83,6 @@ void print_tree(Node *node) {
   std::cout << '\n';
 
   print_tree(node->left_child);
-}
-
-std::vector<int> load_file(const char *str) {
-  std::ifstream infile(str);
-  std::string line;
-  std::vector<int> values;
-
-  while (std::getline(infile, line)) {
-    std::istringstream iss(line);
-    std::string str;
-
-    iss >> str;
-
-    values.push_back(std::stoi(str));
-  }
-
-  return values;
 }
 
 Node *find_by_value(Node *node, int val, std::vector<Node *> *path) {
@@ -193,6 +178,35 @@ void free_tree(Node *node) {
   free_tree(node->left_child);
   free_tree(node->right_child);
   delete node;
+}
+
+std::optional<int> safe_stoi(std::string &str) {
+  try {
+    return std::optional(std::stoi(str));
+  } catch (const std::invalid_argument &) {
+    return std::nullopt;
+  } catch (const std::out_of_range &) {
+    return std::nullopt;
+  }
+}
+
+std::vector<int> load_file(const char *str) {
+  std::ifstream infile(str);
+  std::string line;
+  std::vector<int> values;
+
+  while (std::getline(infile, line)) {
+    std::istringstream iss(line);
+    std::string str;
+
+    iss >> str;
+
+    if (auto num = safe_stoi(str)) {
+      values.push_back(*num);
+    }
+  }
+
+  return values;
 }
 
 int main(int argc, char *argv[]) {
