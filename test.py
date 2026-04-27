@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-def main():
+def main() -> None:
     for (root, dirs, files) in os.walk("./tests/"):
         if len(files) >= 2:
             expected_result = ""

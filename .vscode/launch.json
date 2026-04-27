@@ -1,0 +1,13 @@
+{
+  "configurations": [
+    {
+      "name": "Debug main",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/main",
+      "args": ["./demo/data"],
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false
+    }
+  ]
+}
